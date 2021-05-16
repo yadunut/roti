@@ -68,6 +68,7 @@ export default async (
       try {
         const user = await wg.deleteUser(id);
         res.status(200).json(user);
+        return;
       } catch (e) {
         if (e instanceof Error) {
           res.status(400).json({ error: e.message });
@@ -81,6 +82,7 @@ export default async (
 
     default: {
       res.status(400).json({ error: "invalid method" });
+      return;
     }
   }
 };
