@@ -10,6 +10,7 @@ export interface User {
   name: string;
   publicKey: string;
   privateKey: string;
+  keepAlive: boolean;
   _id: string;
 }
 
@@ -56,7 +57,15 @@ export class Wireguard {
     return [privKey, pubKey];
   }
 
-  async createUser({ name, hostID }: { name: string; hostID?: number }) {
+  async createUser({
+    name,
+    hostID,
+    keepAlive = false,
+  }: {
+    name: string;
+    hostID?: number;
+    keepAlive?: boolean;
+  }) {
     const [privKey, pubKey] = this.generateKeys();
 
     const user = await this.db.createUser({
@@ -64,6 +73,7 @@ export class Wireguard {
       hostID,
       publicKey: pubKey,
       privateKey: privKey,
+      keepAlive,
       _id: uuid(),
     });
     this.updateConfig();
@@ -118,6 +128,7 @@ PrivateKey=${server.privateKey}
 [Peer]
 PublicKey = ${user.publicKey}
 AllowedIPs = ${this.config.network}.${user.hostID}/32
+${user.keepAlive ? "PersistentKeepalive = 25" : ""}
 ### end ${user.name} ###
 `;
     });

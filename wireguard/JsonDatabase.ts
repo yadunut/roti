@@ -25,8 +25,6 @@ export default class JSONDatabase implements Database {
     }
 
     const hostIDs = users.map((user) => user.hostID);
-    console.log(`hostIDS: ${hostIDs}`);
-    console.log(`user hostid: ${user.hostID}`);
 
     if (hostIDs.includes(user.hostID)) {
       throw new Error("User cannot have same hostID as another user");
@@ -37,7 +35,8 @@ export default class JSONDatabase implements Database {
     const users = await this.getUsers();
     const hostIDs = users.map((user) => user.hostID);
 
-    if (isNil(newUser.hostID)) {
+    if (isNil(newUser.hostID) || isNaN(newUser.hostID)) {
+      console.log(`hostid is nil`);
       for (let i = 2; i < 254; i++) {
         if (!hostIDs.includes(i)) {
           newUser.hostID = i;
