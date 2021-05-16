@@ -2,7 +2,7 @@ import { isEmpty, isNil } from "lodash";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { User } from "../wireguard";
+import { DefaultWireguard as wg, User } from "../wireguard";
 
 interface Props {
   users: User[];
@@ -75,11 +75,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     data?: User[];
     error?: string;
   };
-  const res = await fetch("http://localhost:3000/api/users");
-  const { data, error }: JSONResponse = await res.json();
-  if (!isEmpty(error)) {
-    return { props: { error } };
+  try {
+    const users = await wg.getUsers();
+    return { props: { users } };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { props: { error: e.message } };
+    } else {
+      return { props: { error: e } };
+    }
   }
-
-  return { props: { users: data } };
 };
